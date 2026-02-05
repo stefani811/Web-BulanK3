@@ -131,6 +131,7 @@ body {
 .hero-year {
     font-size: 3rem;
     font-weight: bold;
+    font-family: 'Luckiest Guy', Arial, sans-serif;
     margin-bottom: 20px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
@@ -203,6 +204,7 @@ body {
 
 .scoreboard-table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: separate;
     border-spacing: 0;
 }
@@ -220,6 +222,7 @@ body {
 
 .scoreboard-item td {
     padding: 35px 20px;
+    justify-content: center;
     vertical-align: middle;
     border: none;
 }
@@ -259,7 +262,7 @@ body {
 }
 
 .scoreboard-item .score {
-    width: 40%;
+    width: 30%;
     text-align: center;
     justify-content: center;
 }
