@@ -1,0 +1,551 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Font Faces */
+@font-face {
+    font-family: 'Luckiest Guy';
+    src: url('../fonts/LuckiestGuy-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Maven Pro';
+    src: url('../fonts/MavenPro-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Google Sans';
+    src: url('../fonts/GoogleSans-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    overflow-x: hidden;
+}
+
+/* Hero Section */
+.hero-section {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
+    z-index: 2;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    padding: 20px;
+    color: white;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-k3 {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 5;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: white;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.logo-k3 img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.logo-indofood {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 5;
+    max-width: 120px;
+    height: auto;
+}
+
+.logo-indofood img {
+    width: 100%;
+    height: auto;
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    font-family: 'Luckiest Guy', Arial, sans-serif;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
+}
+
+.hero-year {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero-vision {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    max-width: 90%;
+    margin: 0 auto;
+    font-family: 'Maven Pro', Arial, sans-serif;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Section Title */
+.section-title {
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: 'Google Sans', Arial, sans-serif;
+    text-align: center;
+    color: #4a90e2;
+    margin: 40px 0 30px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Scoreboard Section */
+.scoreboard-section {
+    padding: 0px 20px;
+    background-color: #f0f4f8;
+}
+
+.scoreboard-container {
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative;
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.scoreboard-wrapper {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 12px;
+    overscroll-behavior: contain;
+}
+
+/* Custom Scrollbar */
+.scoreboard-wrapper::-webkit-scrollbar {
+    width: 15px;
+}
+
+.scoreboard-wrapper::-webkit-scrollbar-track {
+    background: #e0e0e0;
+    border-radius: 10px;
+}
+
+.scoreboard-wrapper::-webkit-scrollbar-thumb {
+    background: #4a90e2;
+    border-radius: 10px;
+}
+
+.scoreboard-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #357abd;
+}
+
+.scoreboard-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.scoreboard-item {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 2px solid #4a90e2;
+    position: relative;
+}
+
+.scoreboard-item:not(:last-child) {
+    margin-bottom: 20px;
+}
+
+.scoreboard-item td {
+    padding: 35px 20px;
+    vertical-align: middle;
+    border: none;
+}
+
+.scoreboard-item:first-child td:first-child {
+    border-top-left-radius: 20px;
+}
+
+.scoreboard-item:first-child td:last-child {
+    border-top-right-radius: 20px;
+}
+
+.scoreboard-item:last-child td:first-child {
+    border-bottom-left-radius: 20px;
+}
+
+.scoreboard-item:last-child td:last-child {
+    border-bottom-right-radius: 20px;
+}
+
+.scoreboard-item::after {
+    content: '';
+    position: absolute;
+    right: -2px;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    border-radius: 0 20px 20px 0;
+    pointer-events: none;
+}
+
+.team-left,
+.team-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.scoreboard-item .score {
+    width: 40%;
+    text-align: center;
+    justify-content: center;
+}
+
+.team-logo {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 10px;
+}
+
+.team-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.team-name {
+    color: white;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.score {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Team Section */
+.team-section {
+    padding: 40px 20px 60px;
+    background-color: #f0f4f8;
+}
+
+.team-carousel-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    margin: 30px 0;
+}
+
+.team-carousel {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    will-change: transform;
+}
+
+.carousel-arrow {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.carousel-arrow:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.carousel-arrow:active {
+    transform: scale(0.95);
+}
+
+.carousel-arrow .material-symbols-outlined {
+    font-size: 20px;
+}
+
+
+.team-carousel {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    will-change: transform;
+}
+
+.team-card {
+    min-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    position: relative;
+}
+
+.team-logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+    margin-bottom: 30px;
+    width: 100%;
+    position: relative;
+}
+
+.team-logo-large {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.team-logo-large img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.btn-view-players {
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-view-players .material-symbols-outlined {
+    font-size: 24px;
+}
+
+.btn-view-players:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+}
+
+.btn-view-players:active {
+    transform: translateY(0);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    overflow: auto;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    right: 20px;
+    top: 15px;
+}
+
+.close:hover {
+    color: #000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-year {
+        font-size: 2.5rem;
+    }
+    
+    .hero-vision {
+        font-size: 0.85rem;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .score {
+        font-size: 2rem;
+    }
+    
+    .team-logo-large {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .carousel-arrow {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .carousel-arrow .material-symbols-outlined {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 1.5rem;
+    }
+    
+    .hero-year {
+        font-size: 2rem;
+    }
+    
+    .logo-k3 {
+        width: 60px;
+        height: 60px;
+        top: 15px;
+        left: 15px;
+        padding: 8px;
+    }
+    
+    .logo-indofood {
+        max-width: 90px;
+        top: 15px;
+        right: 15px;
+    }
+    
+    .scoreboard-item td {
+        padding: 20px 15px;
+    }
+    
+    .team-logo {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .team-name {
+        font-size: 0.75rem;
+    }
+    
+    .score {
+        font-size: 1.5rem;
+    }
+    
+    .team-logo-large {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .carousel-arrow {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .carousel-arrow .material-symbols-outlined {
+        font-size: 18px;
+    }
+    
+    .btn-view-players {
+        padding: 12px 30px;
+        font-size: 0.9rem;
+    }
+}
+
