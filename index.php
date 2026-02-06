@@ -2,12 +2,12 @@
 require_once __DIR__ . '/includes/functions.php';
 
 $eventInfo = getEventInfo();
-$eventTitle = $eventInfo ? $eventInfo['event_title'] : 'BULAN K3 NASIONAL';
-$eventYear = $eventInfo ? $eventInfo['event_year'] : 2026;
-$eventVision = $eventInfo ? $eventInfo['event_vision'] : 'Membangun Ekosistem Pengelolaan K3 Nasional yang Profesional, Andal, dan Kolaboratif';
-$backgroundText = $eventInfo ? $eventInfo['background_text'] : '';
-$aboutK3 = $eventInfo ? $eventInfo['about_k3'] : '';
-$eventPurpose = $eventInfo ? $eventInfo['event_purpose'] : '';
+$eventTitle = $eventInfo && isset($eventInfo['event_title']) ? $eventInfo['event_title'] : 'BULAN K3 NASIONAL';
+$eventYear = $eventInfo && isset($eventInfo['event_year']) ? $eventInfo['event_year'] : 2026;
+$eventVision = $eventInfo && isset($eventInfo['event_vision']) ? $eventInfo['event_vision'] : 'Membangun Ekosistem Pengelolaan K3 Nasional yang Profesional, Andal, dan Kolaboratif';
+$backgroundText = $eventInfo && isset($eventInfo['background_text']) ? $eventInfo['background_text'] : '';
+$aboutK3 = $eventInfo && isset($eventInfo['about_k3']) ? $eventInfo['about_k3'] : '';
+$eventPurpose = $eventInfo && isset($eventInfo['event_purpose']) ? $eventInfo['event_purpose'] : '';
 
 $matches = getAllMatchesWithOngoing();
 $teams = getAllTeams();
@@ -44,46 +44,67 @@ $leaderboard = getLeaderboard();
     </section>
 
     <!-- Latar Belakang Kegiatan Section -->
-    <section class="info-section">
-        <h2 class="section-title">Latar Belakang Kegiatan</h2>
-        <div class="info-content">
-            <?php if (!empty($backgroundText)): ?>
-                <p><?php echo nl2br(htmlspecialchars($backgroundText)); ?></p>
-            <?php else: ?>
-                <p>Dalam rangka memperingati Bulan Kesehatan dan Keselamatan Kerja (K3), PT Indofood CBP Sukses Makmur Tbk menyelenggarakan kegiatan Turnamen Mini Soccer sebagai salah satu bentuk implementasi budaya K3 di lingkungan kerja.</p>
-                <p>Kegiatan ini bertujuan untuk meningkatkan kesadaran karyawan akan pentingnya kesehatan fisik, keselamatan kerja, serta mempererat kebersamaan dan sportivitas antar karyawan melalui aktivitas olahraga yang positif dan aman.</p>
-            <?php endif; ?>
+    <section class="info-section background-section wave-top-right">
+        <div class="info-wrapper">
+            <h2 class="section-title">Latar Belakang Kegiatan</h2>
+            <div class="info-grid">
+                <div class="info-text-col">
+                    <?php if (!empty($backgroundText)): ?>
+                        <p><?php echo nl2br(htmlspecialchars($backgroundText)); ?></p>
+                    <?php else: ?>
+                        <p>Dalam rangka memperingati Bulan Kesehatan dan Keselamatan Kerja (K3), PT Indofood CBP Sukses Makmur Tbk menyelenggarakan kegiatan Turnamen Mini Soccer sebagai salah satu bentuk implementasi budaya K3 di lingkungan kerja.</p>
+                        <p>Kegiatan ini bertujuan untuk meningkatkan kesadaran karyawan akan pentingnya kesehatan fisik, keselamatan kerja, serta mempererat kebersamaan dan sportivitas antar karyawan melalui aktivitas olahraga yang positif dan aman.</p>
+                    <?php endif; ?>
+                </div>
+                <div class="info-image-col">
+                    <img src="GambarBagianLatarBelakang/gbr 1.png" alt="Latar Belakang" class="info-image">
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- Apa itu Bulan K3 Section -->
-    <section class="info-section">
-        <h2 class="section-title">Apa itu Bulan K3?</h2>
-        <div class="info-content">
-            <?php if (!empty($aboutK3)): ?>
-                <p><?php echo nl2br(htmlspecialchars($aboutK3)); ?></p>
-            <?php else: ?>
-                <p>Bulan K3 merupakan program nasional tahunan untuk meningkatkan penerapan Kesehatan dan Keselamatan Kerja (K3), guna menciptakan lingkungan kerja yang aman, sehat, produktif, serta menumbuhkan budaya keselamatan sebagai tanggung jawab bersama.</p>
-            <?php endif; ?>
+    <section class="info-section background-section">
+        <div class="info-wrapper">
+            <h2 class="section-title">Apa itu Bulan K3?</h2>
+            <div class="info-grid">
+                <div class="info-text-col">
+                    <?php if (!empty($aboutK3)): ?>
+                        <p><?php echo nl2br(htmlspecialchars($aboutK3)); ?></p>
+                    <?php else: ?>
+                        <p>Bulan K3 merupakan program nasional tahunan untuk meningkatkan penerapan Kesehatan dan Keselamatan Kerja (K3), guna menciptakan lingkungan kerja yang aman, sehat, produktif, serta menumbuhkan budaya keselamatan sebagai tanggung jawab bersama.</p>
+                    <?php endif; ?>
+                </div>
+                <div class="info-image-col">
+                    <img src="GambarBagianLatarBelakang/gbr 2.png" alt="Apa itu Bulan K3" class="info-image">
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- Tujuan Kegiatan Section -->
-    <section class="info-section">
-        <h2 class="section-title">Tujuan Kegiatan</h2>
-        <div class="info-content">
-            <?php if (!empty($eventPurpose)): ?>
-                <p><?php echo nl2br(htmlspecialchars($eventPurpose)); ?></p>
-            <?php else: ?>
-                <p>Penyelenggaraan Turnamen Mini Soccer dalam rangka Bulan K3 ini bertujuan untuk:</p>
-                <ul>
-                    <li>Meningkatkan kesadaran karyawan akan pentingnya kesehatan dan keselamatan kerja.</li>
-                    <li>mendorong gaya hidup sehat.</li>
-                    <li>Mempererat hubungan dan kerja sama antar karyawan lintas departemen.</li>
-                    <li>Menumbuhkan nilai sportivitas, disiplin, dan kebersamaan di lingkungan kerja.</li>
-                    <li>Mendukung penerapan budaya K3 secara berkelanjutan di PT Indofood CBP Sukses Makmur Tbk.</li>
-                </ul>
-            <?php endif; ?>
+    <section class="info-section background-section wave-bottom-left">
+        <div class="info-wrapper">
+            <h2 class="section-title">Tujuan Kegiatan</h2>
+            <div class="info-grid">
+                <div class="info-text-col">
+                    <?php if (!empty($eventPurpose)): ?>
+                        <p><?php echo nl2br(htmlspecialchars($eventPurpose)); ?></p>
+                    <?php else: ?>
+                        <p>Penyelenggaraan Turnamen Mini Soccer dalam rangka Bulan K3 ini bertujuan untuk:</p>
+                        <ul>
+                            <li>Meningkatkan kesadaran karyawan akan pentingnya kesehatan dan keselamatan kerja.</li>
+                            <li>mendorong gaya hidup sehat.</li>
+                            <li>Mempererat hubungan dan kerja sama antar karyawan lintas departemen.</li>
+                            <li>Menumbuhkan nilai sportivitas, disiplin, dan kebersamaan di lingkungan kerja.</li>
+                            <li>Mendukung penerapan budaya K3 secara berkelanjutan di PT Indofood CBP Sukses Makmur Tbk.</li>
+                        </ul>
+                    <?php endif; ?>
+                </div>
+                <div class="info-image-col">
+                    <img src="GambarBagianLatarBelakang/gbr 3.png" alt="Tujuan Kegiatan" class="info-image">
+                </div>
+            </div>
         </div>
     </section>
 
@@ -124,7 +145,12 @@ $leaderboard = getLeaderboard();
                                 $dayName = $days[$i];
                                 $dateStr = $currentDate->format('M d');
                             ?>
-                                <th><?php echo $dayName . ' ' . $dateStr; ?></th>
+                                <th>
+                                    <div class="schedule-date-header">
+                                        <div class="schedule-day"><?php echo $dayName; ?></div>
+                                        <div class="schedule-date"><?php echo $dateStr; ?></div>
+                                    </div>
+                                </th>
                             <?php endfor; ?>
                         </tr>
                     </thead>
@@ -164,6 +190,20 @@ $leaderboard = getLeaderboard();
     <!-- Leaderboard Section -->
     <section class="leaderboard-section">
         <h2 class="section-title">LEADERBOARD</h2>
+        <div class="trophies-container">
+            <div class="trophy trophy-2">
+                <span class="material-symbols-outlined trophy-icon">emoji_events</span>
+                <span class="trophy-label">2</span>
+            </div>
+            <div class="trophy trophy-1">
+                <span class="material-symbols-outlined trophy-icon">emoji_events</span>
+                <span class="trophy-label">1</span>
+            </div>
+            <div class="trophy trophy-3">
+                <span class="material-symbols-outlined trophy-icon">emoji_events</span>
+                <span class="trophy-label">3</span>
+            </div>
+        </div>
         <div class="leaderboard-container">
             <table class="leaderboard-table">
                 <thead>
