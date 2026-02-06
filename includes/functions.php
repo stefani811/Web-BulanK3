@@ -1,9 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
 
-/**
- * Get all teams
- */
 function getAllTeams() {
     $conn = getDBConnection();
     $sql = "SELECT * FROM teams ORDER BY team_name ASC";
@@ -20,9 +17,6 @@ function getAllTeams() {
     return $teams;
 }
 
-/**
- * Get team by code
- */
 function getTeamByCode($teamCode) {
     $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT * FROM teams WHERE team_code = ?");
@@ -40,9 +34,6 @@ function getTeamByCode($teamCode) {
     return $team;
 }
 
-/**
- * Get players by team ID
- */
 function getPlayersByTeamId($teamId) {
     $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT * FROM players WHERE team_id = ? ORDER BY player_number ASC, player_name ASC");
@@ -62,9 +53,6 @@ function getPlayersByTeamId($teamId) {
     return $players;
 }
 
-/**
- * Get players by team code
- */
 function getPlayersByTeamCode($teamCode) {
     $team = getTeamByCode($teamCode);
     if ($team) {
@@ -73,9 +61,6 @@ function getPlayersByTeamCode($teamCode) {
     return [];
 }
 
-/**
- * Get all matches (latest first)
- */
 function getAllMatches() {
     $conn = getDBConnection();
     $sql = "SELECT m.*, 
@@ -104,9 +89,6 @@ function getAllMatches() {
     return $matches;
 }
 
-/**
- * Get event information
- */
 function getEventInfo() {
     $conn = getDBConnection();
     $sql = "SELECT * FROM event_info ORDER BY id DESC LIMIT 1";
@@ -121,9 +103,6 @@ function getEventInfo() {
     return $eventInfo;
 }
 
-/**
- * Add new match
- */
 function addMatch($teamHomeId, $teamAwayId, $scoreHome, $scoreAway, $matchDate = null) {
     $conn = getDBConnection();
     
@@ -141,9 +120,6 @@ function addMatch($teamHomeId, $teamAwayId, $scoreHome, $scoreAway, $matchDate =
     return $success;
 }
 
-/**
- * Add new player
- */
 function addPlayer($teamId, $playerName, $playerNumber = null, $position = null) {
     $conn = getDBConnection();
     $stmt = $conn->prepare("INSERT INTO players (team_id, player_name, player_number, position) VALUES (?, ?, ?, ?)");
@@ -156,9 +132,6 @@ function addPlayer($teamId, $playerName, $playerNumber = null, $position = null)
     return $success;
 }
 
-/**
- * Add new team
- */
 function addTeam($teamCode, $teamName, $teamLogo = null) {
     $conn = getDBConnection();
     $stmt = $conn->prepare("INSERT INTO teams (team_code, team_name, team_logo) VALUES (?, ?, ?)");

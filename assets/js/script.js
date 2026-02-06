@@ -1,7 +1,6 @@
-// Team Carousel Auto-scroll
 let currentTeamIndex = 0;
 let carouselInterval;
-const CAROUSEL_DELAY = 9000; // 9 detik delay untuk memberi waktu user klik tombol
+const CAROUSEL_DELAY = 9000;
 let isPaused = false;
 
 function getTotalTeams() {
@@ -9,20 +8,16 @@ function getTotalTeams() {
 }
 
 function initCarousel() {
-    // Re-query team cards in case DOM changed
     const cards = document.querySelectorAll('.team-card');
     if (cards.length === 0) {
         console.log('No team cards found');
         return;
     }
     
-    // Update global variables
     currentTeamIndex = 0;
     
-    // Set initial position
     updateCarouselPosition();
     
-    // Start auto-scroll
     startCarousel();
 }
 
@@ -39,7 +34,6 @@ function nextTeam() {
     
     currentTeamIndex = (currentTeamIndex + 1) % totalTeams;
     updateCarouselPosition();
-    // Reset carousel timer when manually navigating
     if (carouselInterval) {
         clearInterval(carouselInterval);
         startCarousel();
@@ -52,7 +46,6 @@ function previousTeam() {
     
     currentTeamIndex = (currentTeamIndex - 1 + totalTeams) % totalTeams;
     updateCarouselPosition();
-    // Reset carousel timer when manually navigating
     if (carouselInterval) {
         clearInterval(carouselInterval);
         startCarousel();
@@ -60,13 +53,11 @@ function previousTeam() {
 }
 
 function startCarousel() {
-    // Clear existing interval if any
     if (carouselInterval) {
         clearInterval(carouselInterval);
     }
     
     if (!isPaused) {
-        // Start new interval
         carouselInterval = setInterval(nextTeam, CAROUSEL_DELAY);
     }
 }
@@ -86,17 +77,13 @@ function resumeCarousel() {
     }
 }
 
-// Pause carousel when user interacts with team section
 const teamSection = document.querySelector('.team-section');
 if (teamSection) {
-    // Pause on hover (desktop)
     teamSection.addEventListener('mouseenter', stopCarousel);
     teamSection.addEventListener('mouseleave', resumeCarousel);
     
-    // Pause on touch (mobile)
     teamSection.addEventListener('touchstart', stopCarousel);
     teamSection.addEventListener('touchend', () => {
-        // Resume after 3 seconds of no touch
         setTimeout(() => {
             if (isPaused) {
                 resumeCarousel();
@@ -104,7 +91,6 @@ if (teamSection) {
         }, 3000);
     });
     
-    // Pause when clicking on buttons
     const viewPlayerButtons = document.querySelectorAll('.btn-view-players');
     viewPlayerButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -113,19 +99,15 @@ if (teamSection) {
     });
 }
 
-// View Players Function - Connected to database
 function viewPlayers(teamCode) {
-    // Stop carousel when modal opens
     stopCarousel();
     
     const modal = document.getElementById('playersModal');
     const playersList = document.getElementById('playersList');
     
-    // Show loading
     playersList.innerHTML = '<p style="text-align: center; padding: 20px;">Memuat data pemain...</p>';
     modal.style.display = 'block';
     
-    // Fetch players data from API
     fetch(`api/get_players.php?team_code=${encodeURIComponent(teamCode)}`)
         .then(response => response.json())
         .then(data => {
@@ -165,7 +147,6 @@ function viewPlayers(teamCode) {
             playersList.innerHTML = '<p style="color: red;">Terjadi kesalahan saat memuat data pemain.</p>';
         });
     
-    // Resume carousel when modal closes
     const closeBtn = document.querySelector('.close');
     if (closeBtn) {
         closeBtn.onclick = function() {
@@ -174,7 +155,6 @@ function viewPlayers(teamCode) {
         };
     }
     
-    // Close modal when clicking outside
     window.onclick = function(event) {
         if (event.target === modal) {
             modal.style.display = 'none';
@@ -183,14 +163,11 @@ function viewPlayers(teamCode) {
     };
 }
 
-// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Re-initialize carousel after DOM is ready
     setTimeout(function() {
         initCarousel();
     }, 100);
     
-    // Prevent page scroll when scrolling in scoreboard
     const scoreboardWrapper = document.querySelector('.scoreboard-wrapper');
     if (scoreboardWrapper) {
         scoreboardWrapper.addEventListener('wheel', function(e) {
@@ -199,7 +176,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const isAtTop = this.scrollTop === 0;
             const isAtBottom = this.scrollTop + this.clientHeight >= this.scrollHeight - 1;
             
-            // Prevent page scroll when scrolling in scoreboard
             if ((isScrollingDown && !isAtBottom) || (isScrollingUp && !isAtTop)) {
                 e.stopPropagation();
             }

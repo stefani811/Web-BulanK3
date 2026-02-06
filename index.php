@@ -1,16 +1,13 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
 
-// Get event info
 $eventInfo = getEventInfo();
 $eventTitle = $eventInfo ? $eventInfo['event_title'] : 'BULAN K3 NASIONAL';
 $eventYear = $eventInfo ? $eventInfo['event_year'] : 2026;
 $eventVision = $eventInfo ? $eventInfo['event_vision'] : 'Membangun Ekosistem Pengelolaan K3 Nasional yang Profesional, Andal, dan Kolaboratif';
 
-// Get matches for scoreboard
 $matches = getAllMatches();
 
-// Get teams for carousel
 $teams = getAllTeams();
 ?>
 <!DOCTYPE html>
@@ -114,7 +111,6 @@ $teams = getAllTeams();
         </div>
     </section>
 
-    <!-- Modal for View Players (will be implemented later) -->
     <div id="playersModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>

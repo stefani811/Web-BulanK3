@@ -1,11 +1,8 @@
 -- Database Schema for BULAN K3 NASIONAL 2026 Mini Soccer Tournament
--- Created for Web-BulanK3 Project
 
--- Create Database
 CREATE DATABASE IF NOT EXISTS bulan_k3_2026 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE bulan_k3_2026;
 
--- Table: teams (Data Klub Football)
 CREATE TABLE IF NOT EXISTS teams (
     id INT AUTO_INCREMENT PRIMARY KEY,
     team_code VARCHAR(50) UNIQUE NOT NULL COMMENT 'Kode unik tim (btp, laminasi, ppic, dll)',
