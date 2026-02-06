@@ -143,5 +143,109 @@ function addTeam($teamCode, $teamName, $teamLogo = null) {
     
     return $success;
 }
+
+/**
+ * Get schedule by week number
+ */
+function getScheduleByWeek($weekNumber = 1) {
+    $conn = getDBConnection();
+    $stmt = $conn->prepare("SELECT s.*, 
+                                   t1.team_name as home_team_name, 
+                                   t1.team_code as home_team_code,
+                                   t2.team_name as away_team_name, 
+                                   t2.team_code as away_team_code
+                            FROM schedule s
+                            INNER JOIN teams t1 ON s.team_home_id = t1.id
+                            INNER JOIN teams t2 ON s.team_away_id = t2.id
+                            WHERE s.week_number = ?
+                            ORDER BY s.match_date ASC, s.match_time ASC");
+    $stmt->bind_param("i", $weekNumber);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $schedule = [];
+    if ($result && $result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $schedule[] = $row;
+        }
+    }
+    
+    $stmt->close();
+    closeDBConnection($conn);
+    return $schedule;
+}
+
+/**
+ * Get leaderboard (total score per team)
+ */
+function getLeaderboard() {
+    $conn = getDBConnection();
+    $sql = "SELECT 
+                t.id,
+                t.team_code,
+                t.team_name,
+                t.team_logo,
+                COALESCE(SUM(CASE 
+                    WHEN m.team_home_id = t.id THEN m.score_home
+                    WHEN m.team_away_id = t.id THEN m.score_away
+                    ELSE 0
+                END), 0) as total_score
+            FROM teams t
+            LEFT JOIN matches m ON (m.team_home_id = t.id OR m.team_away_id = t.id) 
+                AND m.match_status = 'finished'
+            GROUP BY t.id, t.team_code, t.team_name, t.team_logo
+            ORDER BY total_score DESC, t.team_name ASC";
+    
+    $result = $conn->query($sql);
+    
+    $leaderboard = [];
+    if ($result && $result->num_rows > 0) {
+        $rank = 1;
+        while ($row = $result->fetch_assoc()) {
+            $row['rank'] = $rank++;
+            $leaderboard[] = $row;
+        }
+    }
+    
+    closeDBConnection($conn);
+    return $leaderboard;
+}
+
+/**
+ * Get all matches including ongoing
+ */
+function getAllMatchesWithOngoing() {
+    $conn = getDBConnection();
+    $sql = "SELECT m.*, 
+                   t1.team_name as home_team_name, 
+                   t1.team_logo as home_team_logo,
+                   t1.team_code as home_team_code,
+                   t2.team_name as away_team_name, 
+                   t2.team_logo as away_team_logo,
+                   t2.team_code as away_team_code
+            FROM matches m
+            INNER JOIN teams t1 ON m.team_home_id = t1.id
+            INNER JOIN teams t2 ON m.team_away_id = t2.id
+            ORDER BY 
+                CASE m.match_status 
+                    WHEN 'ongoing' THEN 1
+                    WHEN 'finished' THEN 2
+                    WHEN 'scheduled' THEN 3
+                END,
+                m.match_date DESC, 
+                m.created_at DESC";
+    
+    $result = $conn->query($sql);
+    
+    $matches = [];
+    if ($result && $result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $matches[] = $row;
+        }
+    }
+    
+    closeDBConnection($conn);
+    return $matches;
+}
 ?>
 

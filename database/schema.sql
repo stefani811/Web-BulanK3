@@ -53,7 +53,26 @@ CREATE TABLE IF NOT EXISTS event_info (
     event_description TEXT COMMENT 'Deskripsi event',
     about_k3 TEXT COMMENT 'Penjelasan tentang Bulan K3',
     event_purpose TEXT COMMENT 'Tujuan diadakan event',
+    background_text TEXT COMMENT 'Latar belakang kegiatan',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table: schedule (Jadwal Pertandingan)
+CREATE TABLE IF NOT EXISTS schedule (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    team_home_id INT NOT NULL COMMENT 'ID tim tuan rumah',
+    team_away_id INT NOT NULL COMMENT 'ID tim tamu',
+    match_date DATE NOT NULL COMMENT 'Tanggal pertandingan',
+    match_time TIME NOT NULL COMMENT 'Waktu pertandingan',
+    week_number INT NOT NULL DEFAULT 1 COMMENT 'Minggu ke berapa',
+    match_status ENUM('scheduled', 'ongoing', 'finished') DEFAULT 'scheduled' COMMENT 'Status pertandingan',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (team_home_id) REFERENCES teams(id) ON DELETE CASCADE,
+    FOREIGN KEY (team_away_id) REFERENCES teams(id) ON DELETE CASCADE,
+    INDEX idx_match_date (match_date),
+    INDEX idx_week_number (week_number),
+    INDEX idx_match_status (match_status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

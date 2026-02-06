@@ -163,6 +163,63 @@ function viewPlayers(teamCode) {
     };
 }
 
+// Leaderboard Sorting
+let leaderboardSortDirection = {
+    rank: 'desc',
+    team: 'asc',
+    score: 'desc'
+};
+
+function sortLeaderboard(column) {
+    const tbody = document.getElementById('leaderboardBody');
+    if (!tbody) return;
+    
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const currentDirection = leaderboardSortDirection[column];
+    const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+    leaderboardSortDirection[column] = newDirection;
+    
+    rows.sort((a, b) => {
+        let aValue, bValue;
+        
+        if (column === 'rank') {
+            aValue = parseInt(a.cells[0].textContent.trim());
+            bValue = parseInt(b.cells[0].textContent.trim());
+        } else if (column === 'team') {
+            aValue = a.cells[1].textContent.trim().toLowerCase();
+            bValue = b.cells[1].textContent.trim().toLowerCase();
+        } else if (column === 'score') {
+            aValue = parseInt(a.cells[2].textContent.trim()) || 0;
+            bValue = parseInt(b.cells[2].textContent.trim()) || 0;
+        }
+        
+        if (newDirection === 'asc') {
+            return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+        } else {
+            return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
+        }
+    });
+    
+    // Update rank after sorting
+    rows.forEach((row, index) => {
+        row.cells[0].textContent = index + 1;
+        tbody.appendChild(row);
+    });
+    
+    // Update sort icons
+    document.querySelectorAll('.sort-icon').forEach(icon => {
+        icon.textContent = 'expand_all';
+    });
+    
+    const activeHeader = document.querySelector(`th[data-sort="${column}"]`);
+    if (activeHeader) {
+        const icon = activeHeader.querySelector('.sort-icon');
+        if (icon) {
+            icon.textContent = newDirection === 'asc' ? 'expand_less' : 'expand_more';
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
         initCarousel();
@@ -181,5 +238,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // Leaderboard sorting
+    document.querySelectorAll('.leaderboard-table th.sortable').forEach(header => {
+        header.addEventListener('click', function() {
+            const column = this.getAttribute('data-sort');
+            if (column) {
+                sortLeaderboard(column);
+            }
+        });
+    });
 });
 

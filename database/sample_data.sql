@@ -84,13 +84,31 @@ INSERT INTO matches (team_home_id, team_away_id, score_home, score_away, match_d
 (12, 4, 1, 1, '2026-01-08 14:00:00', 'finished');
 
 -- Insert Event Information
-INSERT INTO event_info (event_title, event_year, event_vision, event_description, about_k3, event_purpose) VALUES
+INSERT INTO event_info (event_title, event_year, event_vision, event_description, about_k3, event_purpose, background_text) VALUES
 (
     'BULAN K3 NASIONAL',
     2026,
     'Membangun Ekosistem Pengelolaan K3 Nasional yang Profesional, Andal, dan Kolaboratif',
     'Bulan K3 Nasional 2026 adalah event tahunan yang diselenggarakan untuk meningkatkan kesadaran dan pemahaman tentang Keselamatan dan Kesehatan Kerja (K3) di seluruh Indonesia. Event ini diisi dengan berbagai kegiatan termasuk turnamen mini soccer antar divisi.',
-    'Bulan K3 (Keselamatan dan Kesehatan Kerja) Nasional adalah program tahunan yang dicanangkan oleh pemerintah Indonesia untuk meningkatkan kesadaran dan komitmen seluruh lapisan masyarakat, khususnya dunia kerja, terhadap pentingnya penerapan K3. Program ini bertujuan untuk menciptakan budaya keselamatan dan kesehatan kerja yang berkelanjutan di seluruh sektor industri dan organisasi di Indonesia.',
-    'Tujuan utama diadakan event Bulan K3 Nasional 2026 ini adalah:\n1. Meningkatkan kesadaran dan pemahaman tentang pentingnya K3 di tempat kerja\n2. Membangun budaya keselamatan yang kuat di seluruh organisasi\n3. Meningkatkan kolaborasi antar divisi melalui kegiatan olahraga\n4. Meningkatkan semangat kebersamaan dan kerja tim\n5. Mempromosikan gaya hidup sehat melalui olahraga\n6. Memberikan edukasi tentang K3 melalui kegiatan yang menyenangkan dan interaktif'
+    'Bulan K3 merupakan program nasional tahunan untuk meningkatkan penerapan Kesehatan dan Keselamatan Kerja (K3), guna menciptakan lingkungan kerja yang aman, sehat, produktif, serta menumbuhkan budaya keselamatan sebagai tanggung jawab bersama.',
+    'Penyelenggaraan Turnamen Mini Soccer dalam rangka Bulan K3 ini bertujuan untuk:\nMeningkatkan kesadaran karyawan akan pentingnya kesehatan dan keselamatan kerja.\nMendorong gaya hidup sehat melalui aktivitas olahraga.\nMempererat hubungan dan kerja sama antar karyawan lintas departemen.\nMenumbuhkan nilai sportivitas, disiplin, dan kebersamaan di lingkungan kerja.\nMendukung penerapan budaya K3 secara berkelanjutan di PT Indofood CBP Sukses Makmur Tbk.',
+    'Dalam rangka memperingati Bulan Kesehatan dan Keselamatan Kerja (K3), PT Indofood CBP Sukses Makmur Tbk menyelenggarakan kegiatan Turnamen Mini Soccer sebagai salah satu bentuk implementasi budaya K3 di lingkungan kerja.\nKegiatan ini bertujuan untuk meningkatkan kesadaran karyawan akan pentingnya kesehatan fisik, keselamatan kerja, serta mempererat kebersamaan dan sportivitas antar karyawan melalui aktivitas olahraga yang positif dan aman.'
 );
+
+-- Insert Schedule (Week 1 - Example dates starting from Feb 2, 2026)
+INSERT INTO schedule (team_home_id, team_away_id, match_date, match_time, week_number, match_status) VALUES
+-- Monday Feb 2
+(4, 2, '2026-02-02', '20:00:00', 1, 'scheduled'),
+-- Tuesday Feb 3
+(8, 9, '2026-02-03', '22:00:00', 1, 'scheduled'),
+-- Wednesday Feb 4
+(1, 3, '2026-02-04', '19:00:00', 1, 'scheduled'),
+-- Thursday Feb 5
+(6, 7, '2026-02-05', '21:00:00', 1, 'scheduled'),
+-- Friday Feb 6
+(10, 11, '2026-02-06', '20:00:00', 1, 'scheduled'),
+-- Saturday Feb 7
+(12, 4, '2026-02-07', '19:00:00', 1, 'scheduled'),
+-- Sunday Feb 8
+(2, 5, '2026-02-08', '21:00:00', 1, 'scheduled');
 

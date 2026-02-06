@@ -5,10 +5,14 @@ $eventInfo = getEventInfo();
 $eventTitle = $eventInfo ? $eventInfo['event_title'] : 'BULAN K3 NASIONAL';
 $eventYear = $eventInfo ? $eventInfo['event_year'] : 2026;
 $eventVision = $eventInfo ? $eventInfo['event_vision'] : 'Membangun Ekosistem Pengelolaan K3 Nasional yang Profesional, Andal, dan Kolaboratif';
+$backgroundText = $eventInfo ? $eventInfo['background_text'] : '';
+$aboutK3 = $eventInfo ? $eventInfo['about_k3'] : '';
+$eventPurpose = $eventInfo ? $eventInfo['event_purpose'] : '';
 
-$matches = getAllMatches();
-
+$matches = getAllMatchesWithOngoing();
 $teams = getAllTeams();
+$schedule = getScheduleByWeek(1); // Week 1
+$leaderboard = getLeaderboard();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -39,6 +43,165 @@ $teams = getAllTeams();
         </div>
     </section>
 
+    <!-- Latar Belakang Kegiatan Section -->
+    <section class="info-section">
+        <h2 class="section-title">Latar Belakang Kegiatan</h2>
+        <div class="info-content">
+            <?php if (!empty($backgroundText)): ?>
+                <p><?php echo nl2br(htmlspecialchars($backgroundText)); ?></p>
+            <?php else: ?>
+                <p>Dalam rangka memperingati Bulan Kesehatan dan Keselamatan Kerja (K3), PT Indofood CBP Sukses Makmur Tbk menyelenggarakan kegiatan Turnamen Mini Soccer sebagai salah satu bentuk implementasi budaya K3 di lingkungan kerja.</p>
+                <p>Kegiatan ini bertujuan untuk meningkatkan kesadaran karyawan akan pentingnya kesehatan fisik, keselamatan kerja, serta mempererat kebersamaan dan sportivitas antar karyawan melalui aktivitas olahraga yang positif dan aman.</p>
+            <?php endif; ?>
+        </div>
+    </section>
+
+    <!-- Apa itu Bulan K3 Section -->
+    <section class="info-section">
+        <h2 class="section-title">Apa itu Bulan K3?</h2>
+        <div class="info-content">
+            <?php if (!empty($aboutK3)): ?>
+                <p><?php echo nl2br(htmlspecialchars($aboutK3)); ?></p>
+            <?php else: ?>
+                <p>Bulan K3 merupakan program nasional tahunan untuk meningkatkan penerapan Kesehatan dan Keselamatan Kerja (K3), guna menciptakan lingkungan kerja yang aman, sehat, produktif, serta menumbuhkan budaya keselamatan sebagai tanggung jawab bersama.</p>
+            <?php endif; ?>
+        </div>
+    </section>
+
+    <!-- Tujuan Kegiatan Section -->
+    <section class="info-section">
+        <h2 class="section-title">Tujuan Kegiatan</h2>
+        <div class="info-content">
+            <?php if (!empty($eventPurpose)): ?>
+                <p><?php echo nl2br(htmlspecialchars($eventPurpose)); ?></p>
+            <?php else: ?>
+                <p>Penyelenggaraan Turnamen Mini Soccer dalam rangka Bulan K3 ini bertujuan untuk:</p>
+                <ul>
+                    <li>Meningkatkan kesadaran karyawan akan pentingnya kesehatan dan keselamatan kerja.</li>
+                    <li>mendorong gaya hidup sehat.</li>
+                    <li>Mempererat hubungan dan kerja sama antar karyawan lintas departemen.</li>
+                    <li>Menumbuhkan nilai sportivitas, disiplin, dan kebersamaan di lingkungan kerja.</li>
+                    <li>Mendukung penerapan budaya K3 secara berkelanjutan di PT Indofood CBP Sukses Makmur Tbk.</li>
+                </ul>
+            <?php endif; ?>
+        </div>
+    </section>
+
+    <!-- Jadwal Section -->
+    <section class="schedule-section">
+        <h2 class="section-title">JADWAL</h2>
+        <div class="schedule-container">
+            <?php
+            // Generate schedule table
+            $times = ['19:00', '20:00', '21:00', '22:00', '23:00', '00:00'];
+            $days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+            
+            // Get first date from schedule or use current week
+            $firstDate = null;
+            if (!empty($schedule)) {
+                $firstDate = new DateTime($schedule[0]['match_date']);
+            } else {
+                $firstDate = new DateTime();
+                $firstDate->modify('monday this week');
+            }
+            
+            // Create schedule map
+            $scheduleMap = [];
+            foreach ($schedule as $s) {
+                $dateKey = $s['match_date'];
+                $timeKey = $s['match_time'];
+                $scheduleMap[$dateKey][$timeKey] = $s;
+            }
+            ?>
+            <div class="schedule-wrapper">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Waktu</th>
+                            <?php for ($i = 0; $i < 7; $i++): 
+                                $currentDate = clone $firstDate;
+                                $currentDate->modify("+$i days");
+                                $dayName = $days[$i];
+                                $dateStr = $currentDate->format('M d');
+                            ?>
+                                <th><?php echo $dayName . ' ' . $dateStr; ?></th>
+                            <?php endfor; ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($times as $time): ?>
+                            <tr>
+                                <td class="time-cell"><?php echo $time; ?></td>
+                                <?php for ($i = 0; $i < 7; $i++): 
+                                    $currentDate = clone $firstDate;
+                                    $currentDate->modify("+$i days");
+                                    $dateKey = $currentDate->format('Y-m-d');
+                                    $hasMatch = isset($scheduleMap[$dateKey][$time]);
+                                    $match = $hasMatch ? $scheduleMap[$dateKey][$time] : null;
+                                ?>
+                                    <td class="schedule-cell <?php echo $hasMatch ? 'has-match' : ''; ?>">
+                                        <?php if ($match): ?>
+                                            <?php if ($match['match_status'] == 'ongoing'): ?>
+                                                <div class="match-info ongoing">
+                                                    <?php echo htmlspecialchars($match['home_team_name']); ?> VS <?php echo htmlspecialchars($match['away_team_name']); ?>
+                                                </div>
+                                            <?php else: ?>
+                                                <div class="match-info">
+                                                    <?php echo htmlspecialchars($match['home_team_name']); ?> VS <?php echo htmlspecialchars($match['away_team_name']); ?>
+                                                </div>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </td>
+                                <?php endfor; ?>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leaderboard Section -->
+    <section class="leaderboard-section">
+        <h2 class="section-title">LEADERBOARD</h2>
+        <div class="leaderboard-container">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-sort="rank">
+                            RK
+                            <span class="sort-icon material-symbols-outlined">expand_all</span>
+                        </th>
+                        <th class="sortable" data-sort="team">
+                            Team
+                            <span class="sort-icon material-symbols-outlined">expand_all</span>
+                        </th>
+                        <th class="sortable" data-sort="score">
+                            Total Score
+                            <span class="sort-icon material-symbols-outlined">expand_all</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                    <?php foreach ($leaderboard as $entry): ?>
+                        <tr>
+                            <td><?php echo $entry['rank']; ?></td>
+                            <td>
+                                <div class="leaderboard-team">
+                                    <?php if ($entry['team_logo']): ?>
+                                        <img src="<?php echo htmlspecialchars($entry['team_logo']); ?>" alt="<?php echo htmlspecialchars($entry['team_name']); ?>" class="leaderboard-logo">
+                                    <?php endif; ?>
+                                    <span><?php echo htmlspecialchars($entry['team_name']); ?></span>
+                                </div>
+                            </td>
+                            <td><?php echo $entry['total_score']; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
     <!-- Scoreboard Section -->
     <section class="scoreboard-section">
         <h2 class="section-title">SCOREBOARD</h2>
@@ -61,7 +224,13 @@ $teams = getAllTeams();
                                         </div>
                                         <div class="team-name"><?php echo htmlspecialchars(strtoupper($match['home_team_name'])); ?></div>
                                     </td>
-                                    <td class="score"><?php echo $match['score_home']; ?> - <?php echo $match['score_away']; ?></td>
+                                    <td class="score">
+                                        <?php if ($match['match_status'] == 'ongoing'): ?>
+                                            VS
+                                        <?php else: ?>
+                                            <?php echo $match['score_home']; ?> - <?php echo $match['score_away']; ?>
+                                        <?php endif; ?>
+                                    </td>
                                     <td class="team-right">
                                         <div class="team-logo">
                                             <img src="<?php echo htmlspecialchars($match['away_team_logo']); ?>" alt="<?php echo htmlspecialchars($match['away_team_name']); ?>">
