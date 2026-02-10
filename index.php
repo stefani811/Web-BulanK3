@@ -60,7 +60,7 @@ $leaderboard = getLeaderboard();
                     </div>
                 </div>
                 <div class="info-decor">
-                    <img src="GambarBagianLatarBelakang/gbr_latar.png" alt="Dekorasi Latar Belakang" class="info-decor-image">
+                    <img src="GambarBagianLatarBelakang/gbr_awal.png" alt="Dekorasi Latar Belakang" class="info-decor-image">
                 </div>
             </div>
 
@@ -108,8 +108,8 @@ $leaderboard = getLeaderboard();
             <!-- Baris 4: Dekorasi bawah (3 kolom) -->
             <div class="info-decor-row">
                 <img src="GambarBagianLatarBelakang/gbr_kiribawah1.png" alt="Dekorasi kiri bawah 1" class="info-decor-bottom">
-                <img src="GambarBagianLatarBelakang/gbr_kiribawah2.png" alt="Dekorasi kiri bawah 2" class="info-decor-bottom">
-                <img src="GambarBagianLatarBelakang/gambar_kananbawah.png" alt="Dekorasi kanan bawah" class="info-decor-bottom">
+                <img src="GambarBagianLatarBelakang/gbr_tengah bawah.png" alt="Dekorasi kiri bawah 2" class="info-decor-bottom">
+                <img src="GambarBagianLatarBelakang/gambar_akhir.png" alt="Dekorasi kanan bawah" class="info-decor-bottom">
             </div>
         </div>
     </section>
@@ -136,7 +136,8 @@ $leaderboard = getLeaderboard();
             $scheduleMap = [];
             foreach ($schedule as $s) {
                 $dateKey = $s['match_date'];
-                $timeKey = $s['match_time'];
+                // Normalisasi waktu ke format HH:MM agar cocok dengan array $times
+                $timeKey = substr($s['match_time'], 0, 5);
                 $scheduleMap[$dateKey][$timeKey] = $s;
             }
             ?>

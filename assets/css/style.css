@@ -165,7 +165,7 @@ body {
 
 /* Info Section (Latar Belakang, Apa itu K3, Tujuan) */
 .info-section {
-    padding: 100px 0px;
+    padding: 10px 0 32px;
     background-color: #f0f4f8;
     position: relative;
     overflow: hidden;
@@ -176,7 +176,7 @@ body {
 }
 
 .info-wrapper {
-    max-width: 1000px;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
@@ -184,7 +184,8 @@ body {
 .info-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
+    column-gap: 60px;
+    row-gap: 32px;
     align-items: center;
 }
 
@@ -228,7 +229,6 @@ body {
 }
 
 .info-decor {
-    margin: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -236,6 +236,7 @@ body {
 
 .info-decor-image {
     width: 100%;
+    max-height: 480px;
     height: auto;
     object-fit: contain;
     filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.25));
@@ -245,20 +246,25 @@ body {
 .info-decor-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 20px;
-    align-items: end;
+    gap: 10px;
+    align-items: center;
 }
 
 .info-decor-bottom {
     width: 100%;
+    max-height: 350px;
     height: auto;
     object-fit: contain;
     justify-self: center;
     filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.25));
-    transform: scale(1.08);
+    transform: scale(1.2);
 }
 
 @media (max-width: 768px) {
+    .info-section {
+        padding: 40px 0 24px;
+    }
+
     .info-row {
         grid-template-columns: 1fr;
     }
@@ -274,12 +280,13 @@ body {
 
     .info-decor-row {
         grid-template-columns: 1fr;
-        gap: 12px;
+        gap: 18px;
+        margin-top: 20px;
     }
 
     .info-decor-bottom {
-        max-width: 320px;
-        transform: scale(1.03);
+        max-width: 420px;
+        transform: scale(1.1);
     }
 }
 
