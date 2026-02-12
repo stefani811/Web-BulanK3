@@ -11,8 +11,16 @@ $eventPurpose = $eventInfo && isset($eventInfo['event_purpose']) ? $eventInfo['e
 
 $matches = getAllMatchesWithOngoing();
 $teams = getAllTeams();
-$schedule = getScheduleByWeek(1); // Week 1
+// Hide QC team from the frontend (non-destructive). Keep team in DB.
+$teams = array_values(array_filter($teams, function($t){
+    $code = isset($t['team_code']) ? strtolower($t['team_code']) : '';
+    $name = isset($t['team_name']) ? strtolower($t['team_name']) : '';
+    return ($code !== 'qc' && strpos($name, 'qc') === false);
+}));
+$week = isset($_GET['week']) ? intval($_GET['week']) : 1;
+$schedule = getScheduleByWeek($week); // selected week
 $leaderboard = getLeaderboard();
+$groupStandings = getGroupStandings();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -117,6 +125,11 @@ $leaderboard = getLeaderboard();
     <!-- Jadwal Section -->
     <section class="schedule-section">
         <h2 class="section-title">JADWAL</h2>
+        <div class="week-buttons" style="margin-bottom:12px;">
+            <?php for ($w=1; $w<=7; $w++): ?>
+                <a href="?week=<?php echo $w; ?>" class="week-btn" style="display:inline-block;margin-right:6px;padding:6px 10px;border-radius:6px;text-decoration:none;background:<?php echo $week===$w ? '#1e3c72' : '#f0f0f0'; ?>;color:<?php echo $week===$w ? '#fff' : '#333'; ?>;">WEEK <?php echo $w; ?></a>
+            <?php endfor; ?>
+        </div>
         <div class="schedule-container">
             <?php
             // Generate schedule table
@@ -132,13 +145,15 @@ $leaderboard = getLeaderboard();
                 $firstDate->modify('monday this week');
             }
             
-            // Create schedule map
+            // Create schedule map (allow multiple matches at same date+time)
             $scheduleMap = [];
             foreach ($schedule as $s) {
                 $dateKey = $s['match_date'];
                 // Normalisasi waktu ke format HH:MM agar cocok dengan array $times
                 $timeKey = substr($s['match_time'], 0, 5);
-                $scheduleMap[$dateKey][$timeKey] = $s;
+                if (!isset($scheduleMap[$dateKey])) $scheduleMap[$dateKey] = [];
+                if (!isset($scheduleMap[$dateKey][$timeKey])) $scheduleMap[$dateKey][$timeKey] = [];
+                $scheduleMap[$dateKey][$timeKey][] = $s;
             }
             ?>
             <div class="schedule-wrapper">
@@ -169,20 +184,21 @@ $leaderboard = getLeaderboard();
                                     $currentDate = clone $firstDate;
                                     $currentDate->modify("+$i days");
                                     $dateKey = $currentDate->format('Y-m-d');
-                                    $hasMatch = isset($scheduleMap[$dateKey][$time]);
-                                    $match = $hasMatch ? $scheduleMap[$dateKey][$time] : null;
+                                    $matchesAtCell = isset($scheduleMap[$dateKey][$time]) ? $scheduleMap[$dateKey][$time] : [];
                                 ?>
-                                    <td class="schedule-cell <?php echo $hasMatch ? 'has-match' : ''; ?>">
-                                        <?php if ($match): ?>
-                                            <?php if ($match['match_status'] == 'ongoing'): ?>
-                                                <div class="match-info ongoing">
-                                                    <?php echo htmlspecialchars($match['home_team_name']); ?> VS <?php echo htmlspecialchars($match['away_team_name']); ?>
-                                                </div>
-                                            <?php else: ?>
-                                                <div class="match-info">
-                                                    <?php echo htmlspecialchars($match['home_team_name']); ?> VS <?php echo htmlspecialchars($match['away_team_name']); ?>
-                                                </div>
-                                            <?php endif; ?>
+                                    <td class="schedule-cell <?php echo !empty($matchesAtCell) ? 'has-match' : ''; ?>">
+                                        <?php if (!empty($matchesAtCell)): ?>
+                                            <?php foreach ($matchesAtCell as $match): ?>
+                                                <?php if ($match['match_status'] == 'ongoing'): ?>
+                                                    <div class="match-info ongoing">
+                                                        <?php echo htmlspecialchars($match['home_team_name']); ?> VS <?php echo htmlspecialchars($match['away_team_name']); ?>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <div class="match-info">
+                                                        <?php echo htmlspecialchars($match['home_team_name']); ?> VS <?php echo htmlspecialchars($match['away_team_name']); ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
                                         <?php endif; ?>
                                     </td>
                                 <?php endfor; ?>
@@ -212,40 +228,54 @@ $leaderboard = getLeaderboard();
             </div>
         </div>
         <div class="leaderboard-container">
-            <table class="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th class="sortable" data-sort="rank">
-                            RK
-                            <span class="sort-icon material-symbols-outlined">expand_all</span>
-                        </th>
-                        <th class="sortable" data-sort="team">
-                            Team
-                            <span class="sort-icon material-symbols-outlined">expand_all</span>
-                        </th>
-                        <th class="sortable" data-sort="score">
-                            Total Score
-                            <span class="sort-icon material-symbols-outlined">expand_all</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboardBody">
-                    <?php foreach ($leaderboard as $entry): ?>
-                        <tr>
-                            <td><?php echo $entry['rank']; ?></td>
-                            <td>
-                                <div class="leaderboard-team">
-                                    <?php if ($entry['team_logo']): ?>
-                                        <img src="<?php echo htmlspecialchars($entry['team_logo']); ?>" alt="<?php echo htmlspecialchars($entry['team_name']); ?>" class="leaderboard-logo">
+            <?php if (!empty($groupStandings) && is_array($groupStandings)): ?>
+                <?php foreach ($groupStandings as $groupName => $teamsList): ?>
+                    <div class="group-standings" style="margin-bottom:18px;">
+                        <h3 style="margin:6px 0 8px 0;">Group <?php echo htmlspecialchars($groupName); ?></h3>
+                        <div style="overflow-x:auto;">
+                            <table class="leaderboard-table" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align:left; padding:8px;">Team</th>
+                                        <th style="padding:8px; text-align:center;">Main</th>
+                                        <th style="padding:8px; text-align:center;">Win</th>
+                                        <th style="padding:8px; text-align:center;">Draw</th>
+                                        <th style="padding:8px; text-align:center;">Lose</th>
+                                        <th style="padding:8px; text-align:center;">Total Poin</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (empty($teamsList)): ?>
+                                        <tr><td colspan="6" style="padding:12px; text-align:center;">Belum ada tim untuk group ini.</td></tr>
+                                    <?php else: ?>
+                                        <?php foreach ($teamsList as $t): ?>
+                                            <tr>
+                                                <td style="padding:8px;">
+                                                    <div style="display:flex;align-items:center;gap:8px;">
+                                                        <?php if (!empty($t['team_logo'])): ?>
+                                                            <img src="<?php echo htmlspecialchars($t['team_logo']); ?>" alt="<?php echo htmlspecialchars($t['team_name']); ?>" style="width:34px;height:34px;border-radius:6px;object-fit:cover;">
+                                                        <?php else: ?>
+                                                            <span class="material-symbols-outlined" style="font-size:28px;color:#1e3c72;">shield</span>
+                                                        <?php endif; ?>
+                                                        <span><?php echo htmlspecialchars($t['team_name']); ?></span>
+                                                    </div>
+                                                </td>
+                                                <td style="text-align:center; padding:8px;"><?php echo $t['played']; ?></td>
+                                                <td style="text-align:center; padding:8px;"><?php echo $t['win']; ?></td>
+                                                <td style="text-align:center; padding:8px;"><?php echo $t['draw']; ?></td>
+                                                <td style="text-align:center; padding:8px;"><?php echo $t['lose']; ?></td>
+                                                <td style="text-align:center; padding:8px;"><?php echo $t['points']; ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
                                     <?php endif; ?>
-                                    <span><?php echo htmlspecialchars($entry['team_name']); ?></span>
-                                </div>
-                            </td>
-                            <td><?php echo $entry['total_score']; ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>Tidak ada data klasemen grup.</p>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -266,9 +296,13 @@ $leaderboard = getLeaderboard();
                             <?php foreach ($matches as $match): ?>
                                 <tr class="scoreboard-item">
                                     <td class="team-left">
-                                        <div class="team-logo">
-                                            <img src="<?php echo htmlspecialchars($match['home_team_logo']); ?>" alt="<?php echo htmlspecialchars($match['home_team_name']); ?>">
-                                        </div>
+                                            <div class="team-logo">
+                                                <?php if (!empty($match['home_team_logo'])): ?>
+                                                    <img src="<?php echo htmlspecialchars($match['home_team_logo']); ?>" alt="<?php echo htmlspecialchars($match['home_team_name']); ?>">
+                                                <?php else: ?>
+                                                    <span class="material-symbols-outlined" style="font-size:34px;color:#fff;">shield</span>
+                                                <?php endif; ?>
+                                            </div>
                                         <div class="team-name"><?php echo htmlspecialchars(strtoupper($match['home_team_name'])); ?></div>
                                     </td>
                                     <td class="score">
@@ -280,7 +314,11 @@ $leaderboard = getLeaderboard();
                                     </td>
                                     <td class="team-right">
                                         <div class="team-logo">
-                                            <img src="<?php echo htmlspecialchars($match['away_team_logo']); ?>" alt="<?php echo htmlspecialchars($match['away_team_name']); ?>">
+                                            <?php if (!empty($match['away_team_logo'])): ?>
+                                                <img src="<?php echo htmlspecialchars($match['away_team_logo']); ?>" alt="<?php echo htmlspecialchars($match['away_team_name']); ?>">
+                                            <?php else: ?>
+                                                <span class="material-symbols-outlined" style="font-size:34px;color:#fff;">shield</span>
+                                            <?php endif; ?>
                                         </div>
                                         <div class="team-name"><?php echo htmlspecialchars(strtoupper($match['away_team_name'])); ?></div>
                                     </td>
@@ -305,12 +343,16 @@ $leaderboard = getLeaderboard();
                 <?php else: ?>
                     <?php foreach ($teams as $team): ?>
                         <div class="team-card">
-                            <div class="team-logo-container">
+                                <div class="team-logo-container">
                                 <button class="carousel-arrow carousel-arrow-left" onclick="previousTeam()">
                                     <span class="material-symbols-outlined">arrow_back_ios</span>
                                 </button>
                                 <div class="team-logo-large">
-                                    <img src="<?php echo htmlspecialchars($team['team_logo']); ?>" alt="<?php echo htmlspecialchars($team['team_name']); ?>">
+                                    <?php if (!empty($team['team_logo'])): ?>
+                                        <img src="<?php echo htmlspecialchars($team['team_logo']); ?>" alt="<?php echo htmlspecialchars($team['team_name']); ?>">
+                                    <?php else: ?>
+                                        <span class="material-symbols-outlined" style="font-size:48px;color:#1e3c72;">shield</span>
+                                    <?php endif; ?>
                                 </div>
                                 <button class="carousel-arrow carousel-arrow-right" onclick="nextTeam()">
                                     <span class="material-symbols-outlined">arrow_forward_ios</span>
@@ -320,6 +362,22 @@ $leaderboard = getLeaderboard();
                                 <span class="material-symbols-outlined">groups</span>
                                 LIHAT PEMAIN
                             </button>
+                            <?php
+                                // Preload players HTML server-side to avoid relying on XHR (some hosts inject interstitials)
+                                $prePlayers = getPlayersByTeamCode($team['team_code']);
+                                $playersHtml = '';
+                                if (!empty($prePlayers)) {
+                                    $playersHtml .= '<h3 style="margin-bottom: 20px; color: #1e3c72;">' . htmlspecialchars($team['team_name']) . '</h3>';
+                                    $playersHtml .= '<ol style="padding-left:20px; margin-top:10px; color:#222;">';
+                                    foreach ($prePlayers as $p) {
+                                        $playersHtml .= '<li style="margin-bottom:6px;">' . htmlspecialchars($p['player_name']) . '</li>';
+                                    }
+                                    $playersHtml .= '</ol>';
+                                } else {
+                                    $playersHtml = '<p style="text-align: center; padding: 20px; color: #666;">Belum ada data pemain untuk tim ini.</p>';
+                                }
+                                echo '<div id="players_data_' . htmlspecialchars($team['team_code']) . '" style="display:none;">' . $playersHtml . '</div>';
+                            ?>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>

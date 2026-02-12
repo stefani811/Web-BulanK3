@@ -107,45 +107,42 @@ function viewPlayers(teamCode) {
     
     playersList.innerHTML = '<p style="text-align: center; padding: 20px;">Memuat data pemain...</p>';
     modal.style.display = 'block';
-    
-    fetch(`api/get_players.php?team_code=${encodeURIComponent(teamCode)}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                playersList.innerHTML = `<p style="color: red;">${data.error}</p>`;
-                return;
-            }
-            
-            let html = '';
-            if (data.team) {
-                html += `<h3 style="margin-bottom: 20px; color: #1e3c72;">${data.team.team_name}</h3>`;
-            }
-            
-            if (data.players && data.players.length > 0) {
-                html += '<div style="overflow-x: auto;">';
-                html += '<table style="width: 100%; border-collapse: collapse; margin-top: 10px;">';
-                html += '<thead><tr style="background: #f0f0f0;"><th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">No</th><th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Nama Pemain</th><th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Posisi</th></tr></thead>';
-                html += '<tbody>';
+    // First try server-side preloaded HTML fragment (avoids XHR issues on some hosts)
+    const preloaded = document.getElementById('players_data_' + teamCode);
+    if (preloaded) {
+        playersList.innerHTML = preloaded.innerHTML;
+    } else {
+        // Fallback to AJAX JSON API if fragment not present
+        fetch(`api/get_players.php?team_code=${encodeURIComponent(teamCode)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    playersList.innerHTML = `<p style="color: red;">${data.error}</p>`;
+                    return;
+                }
                 
-                data.players.forEach((player, index) => {
-                    html += '<tr style="border-bottom: 1px solid #eee;">';
-                    html += `<td style="padding: 10px;">${player.player_number || '-'}</td>`;
-                    html += `<td style="padding: 10px;">${player.player_name}</td>`;
-                    html += `<td style="padding: 10px;">${player.position || '-'}</td>`;
-                    html += '</tr>';
-                });
+                let html = '';
+                if (data.team) {
+                    html += `<h3 style="margin-bottom: 20px; color: #1e3c72;">${data.team.team_name}</h3>`;
+                }
                 
-                html += '</tbody></table></div>';
-            } else {
-                html += '<p style="text-align: center; padding: 20px; color: #666;">Belum ada data pemain untuk tim ini.</p>';
-            }
-            
-            playersList.innerHTML = html;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            playersList.innerHTML = '<p style="color: red;">Terjadi kesalahan saat memuat data pemain.</p>';
-        });
+                if (data.players && data.players.length > 0) {
+                    html += '<ol style="padding-left:20px; margin-top:10px; color:#222;">';
+                    data.players.forEach((player) => {
+                        html += `<li style="margin-bottom:6px;">${player.player_name}</li>`;
+                    });
+                    html += '</ol>';
+                } else {
+                    html += '<p style="text-align: center; padding: 20px; color: #666;">Belum ada data pemain untuk tim ini.</p>';
+                }
+                
+                playersList.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                playersList.innerHTML = '<p style="color: red;">Terjadi kesalahan saat memuat data pemain.</p>';
+            });
+    }
     
     const closeBtn = document.querySelector('.close');
     if (closeBtn) {
@@ -246,6 +243,65 @@ document.addEventListener('DOMContentLoaded', function() {
             if (column) {
                 sortLeaderboard(column);
             }
+        });
+    });
+});
+
+// Week buttons: load schedule via AJAX and preserve scroll position
+document.addEventListener('DOMContentLoaded', function() {
+    function updateWeekButtons(activeWeek) {
+        document.querySelectorAll('.week-btn').forEach(btn => {
+            const href = btn.getAttribute('href') || '';
+            const params = new URL(href, window.location.origin).searchParams;
+            const w = params.get('week') || '1';
+            if (String(w) === String(activeWeek)) {
+                btn.style.background = '#1e3c72';
+                btn.style.color = '#fff';
+            } else {
+                btn.style.background = '#f0f0f0';
+                btn.style.color = '#333';
+            }
+        });
+    }
+
+    document.querySelectorAll('.week-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const href = this.getAttribute('href');
+            if (!href) return;
+
+            // preserve current scroll
+            const scrollY = window.scrollY || window.pageYOffset;
+
+            const fetchUrl = new URL(href, window.location.origin);
+
+            fetch(fetchUrl.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(resp => resp.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    const newSchedule = doc.querySelector('.schedule-container');
+                    const currentSchedule = document.querySelector('.schedule-container');
+                    if (newSchedule && currentSchedule) {
+                        currentSchedule.innerHTML = newSchedule.innerHTML;
+                    }
+
+                    // update URL without reload
+                    history.pushState({}, '', fetchUrl.toString());
+
+                    // update week buttons styling
+                    const activeWeek = fetchUrl.searchParams.get('week') || '1';
+                    updateWeekButtons(activeWeek);
+
+                    // restore scroll position
+                    window.scrollTo(0, scrollY);
+                })
+                .catch(err => {
+                    console.error('Failed to load week:', err);
+                    // fallback to navigate if AJAX fails
+                    window.location.href = href;
+                });
         });
     });
 });

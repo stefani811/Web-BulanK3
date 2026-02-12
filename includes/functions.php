@@ -212,6 +212,117 @@ function getLeaderboard() {
 }
 
 /**
+ * Get standings grouped by logical groups.
+ * Group membership is defined by team_code values in the $groupMap array.
+ * Returns an associative array: ['A' => [ {team...}, ... ], 'B' => [...]]
+ */
+function getGroupStandings() {
+    // Define groups here. Adjust the team_code keys to match your `teams.team_code` values in DB.
+    $groupMap = [
+        // Removed 'accounting' from Group A per request
+        'A' => ['ppic', 'laminasi', 'teknik'],
+        'B' => ['hr', 'supporting', 'slitter'],
+        'C' => ['security', 'warehouse', 'printing'],
+        // Use 'quality' team_code (Quality Squad) instead of 'qc'
+        'D' => ['quality', 'btp', 'puk']
+    ];
+
+    $conn = getDBConnection();
+
+    // Load finished matches
+    $sql = "SELECT m.*, m.team_home_id, m.team_away_id, t1.team_code as home_team_code, t2.team_code as away_team_code
+            FROM matches m
+            INNER JOIN teams t1 ON m.team_home_id = t1.id
+            INNER JOIN teams t2 ON m.team_away_id = t2.id
+            WHERE m.match_status = 'finished'";
+
+    $result = $conn->query($sql);
+    $matches = [];
+    if ($result && $result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $matches[] = $row;
+        }
+    }
+
+    // Prepare standings container
+    $standings = [];
+    foreach ($groupMap as $groupName => $codes) {
+        // initialize teams present in this group from teams table
+        // build a safely escaped IN list
+        $escaped = array_map(function($c) use ($conn) {
+            return "'" . $conn->real_escape_string($c) . "'";
+        }, $codes);
+        $inList = implode(',', $escaped);
+        $sqlTeams = "SELECT id, team_code, team_name, team_logo FROM teams WHERE team_code IN ($inList)";
+        $res = $conn->query($sqlTeams);
+
+        $teams = [];
+        if ($res && $res->num_rows > 0) {
+            while ($r = $res->fetch_assoc()) {
+                $teams[strtolower($r['team_code'])] = [
+                    'id' => $r['id'],
+                    'team_code' => $r['team_code'],
+                    'team_name' => $r['team_name'],
+                    'team_logo' => $r['team_logo'],
+                    'played' => 0,
+                    'win' => 0,
+                    'draw' => 0,
+                    'lose' => 0,
+                    'points' => 0
+                ];
+            }
+        }
+
+        // compute standings using finished matches where both teams are in same group
+        foreach ($matches as $m) {
+            $homeCode = strtolower($m['home_team_code']);
+            $awayCode = strtolower($m['away_team_code']);
+
+            if (!in_array($homeCode, $codes) || !in_array($awayCode, $codes)) continue;
+
+            // ensure both teams exist in fetched teams list
+            if (!isset($teams[$homeCode]) || !isset($teams[$awayCode])) continue;
+
+            $homeScore = intval($m['score_home']);
+            $awayScore = intval($m['score_away']);
+
+            // increment played
+            $teams[$homeCode]['played']++;
+            $teams[$awayCode]['played']++;
+
+            if ($homeScore > $awayScore) {
+                $teams[$homeCode]['win']++;
+                $teams[$awayCode]['lose']++;
+                $teams[$homeCode]['points'] += 3;
+            } elseif ($homeScore < $awayScore) {
+                $teams[$awayCode]['win']++;
+                $teams[$homeCode]['lose']++;
+                $teams[$awayCode]['points'] += 3;
+            } else {
+                $teams[$homeCode]['draw']++;
+                $teams[$awayCode]['draw']++;
+                $teams[$homeCode]['points'] += 1;
+                $teams[$awayCode]['points'] += 1;
+            }
+        }
+
+        // convert to numerically sortable list and sort by points desc, win desc, played asc, name asc
+        $groupList = array_values($teams);
+        usort($groupList, function($a, $b) {
+            if ($a['points'] !== $b['points']) return $b['points'] - $a['points'];
+            if ($a['win'] !== $b['win']) return $b['win'] - $a['win'];
+            if ($a['played'] !== $b['played']) return $a['played'] - $b['played'];
+            return strcasecmp($a['team_name'], $b['team_name']);
+        });
+
+        $standings[$groupName] = $groupList;
+    }
+
+    closeDBConnection($conn);
+    return $standings;
+}
+
+/**
  * Get all matches including ongoing
  */
 function getAllMatchesWithOngoing() {

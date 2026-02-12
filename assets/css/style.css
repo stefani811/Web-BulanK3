@@ -25,6 +25,13 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -263,6 +270,8 @@ body {
     margin-bottom: 15px;
     color: #333;
     text-align: justify;
+    font-family: 'Poppins', 'Maven Pro', Arial, sans-serif;
+    font-weight: 600;
 }
 
 .info-text ul {
@@ -274,6 +283,8 @@ body {
 .info-text li {
     margin-bottom: 10px;
     color: #333;
+    font-family: 'Poppins', 'Maven Pro', Arial, sans-serif;
+    font-weight: 600;
 }
 
 .info-decor {
