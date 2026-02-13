@@ -366,5 +366,78 @@ function getAllMatchesWithOngoing() {
     closeDBConnection($conn);
     return $matches;
 }
-?>
 
+/**
+ * Get top scorers.
+ * If a `player_goals` table exists, use it. Otherwise fall back to a default
+ * hardcoded list (provided as reference) so the UI shows meaningful data.
+ * Returns array of ['player_name' => string, 'goals' => int]
+ */
+function getTopScorers() {
+    $conn = getDBConnection();
+
+    // Check if player_goals table exists
+    $res = $conn->query("SHOW TABLES LIKE 'player_goals'");
+    $scorers = [];
+
+    if ($res && $res->num_rows > 0) {
+        // Aggregate goals per player if table exists
+        $sql = "SELECT p.player_name, SUM(pg.goals) as total_goals
+                FROM player_goals pg
+                LEFT JOIN players p ON pg.player_id = p.id
+                GROUP BY p.player_name
+                ORDER BY total_goals DESC, p.player_name ASC";
+        $q = $conn->query($sql);
+        if ($q && $q->num_rows > 0) {
+            while ($r = $q->fetch_assoc()) {
+                $scorers[] = ['player_name' => $r['player_name'], 'goals' => intval($r['total_goals'])];
+            }
+        }
+    } else {
+        // Fallback sample data (from user's reference). Modify as needed.
+        $fallback = [
+            'Kodri' => 4,
+            'Sanusi' => 4,
+            'Warih' => 6,
+            'Yusron' => 2,
+            'Franky' => 2,
+            'Tole' => 2,
+            'Iskandar' => 2,
+            'Sulassari' => 2,
+            'Rijalul' => 2,
+            'Fani' => 2,
+            'Fauzan' => 2,
+            'Angga' => 1,
+            'Fery O' => 1,
+            'Rohedi' => 1,
+            'Ferdy' => 1,
+            'Matius' => 1,
+            'Sarwani' => 1,
+            'Ryan' => 1,
+            'Rian' => 2,
+            'Sahid' => 1,
+            'Pendi' => 1,
+            'Naufal' => 1,
+            'Bahar' => 1,
+            'Johari' => 1,
+            'Argha' => 1,
+            'Badruh' => 1,
+            'Dodi' => 1
+        ];
+
+        foreach ($fallback as $name => $g) {
+            $scorers[] = ['player_name' => $name, 'goals' => intval($g)];
+        }
+    }
+
+    closeDBConnection($conn);
+
+    // Sort descending by goals
+    usort($scorers, function($a, $b) {
+        if ($a['goals'] === $b['goals']) return strcasecmp($a['player_name'], $b['player_name']);
+        return $b['goals'] - $a['goals'];
+    });
+
+    return $scorers;
+}
+?>

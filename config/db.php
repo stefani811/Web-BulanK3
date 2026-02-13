@@ -1,10 +1,10 @@
 <?php
 $isLocal = ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1' || strpos($_SERVER['HTTP_HOST'], 'localhost') !== false);
 
-define('DB_HOST', 'sql306.infinityfree.com');
-define('DB_USER', 'if0_41118739');              
-define('DB_PASS', 'phONQdfqfpU3mdI');           
-define('DB_NAME', 'if0_41118739_bulank3');
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');              
+define('DB_PASS', '');           
+define('DB_NAME', 'bulan_k3_2026');
 
 function getDBConnection() {
     $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);

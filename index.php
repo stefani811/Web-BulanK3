@@ -31,6 +31,7 @@ $week = isset($_GET['week']) ? intval($_GET['week']) : 1;
 $schedule = getScheduleByWeek($week); // selected week
 $leaderboard = getLeaderboard();
 $groupStandings = getGroupStandings();
+$topScorers = getTopScorers();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -78,14 +79,14 @@ $groupStandings = getGroupStandings();
                     </div>
                 </div>
                 <div class="info-decor">
-                    <img src="GambarBagianLatarBelakang/gbr_awal.png" alt="Dekorasi Latar Belakang" class="info-decor-image">
+                    <img src="GambarBagianLatarBelakang/gbr_awal.png" alt="Dekorasi Latar Belakang" class="info-decor-image clickable-image" data-clickable="image">
                 </div>
             </div>
 
             <!-- Baris 2: gambar kiri, text kanan -->
             <div class="info-row info-row--reverse">
                 <div class="info-decor">
-                    <img src="GambarBagianLatarBelakang/gbr_bulank3.png" alt="Dekorasi Bulan K3" class="info-decor-image">
+                    <img src="GambarBagianLatarBelakang/gbr_bulank3.png" alt="Dekorasi Bulan K3" class="info-decor-image clickable-image" data-clickable="image">
                 </div>
                 <div class="info-panel">
                     <h2 class="section-title">Apa itu Bulan K3?</h2>
@@ -119,15 +120,15 @@ $groupStandings = getGroupStandings();
                     </div>
                 </div>
                 <div class="info-decor">
-                    <img src="GambarBagianLatarBelakang/gbr_kegiatan.png" alt="Dekorasi Tujuan Kegiatan" class="info-decor-image">
+                    <img src="GambarBagianLatarBelakang/gbr_kegiatan.png" alt="Dekorasi Tujuan Kegiatan" class="info-decor-image clickable-image" data-clickable="image">
                 </div>
             </div>
 
             <!-- Baris 4: Dekorasi bawah (3 kolom) -->
             <div class="info-decor-row">
-                <img src="GambarBagianLatarBelakang/gbr_kiribawah1.png" alt="Dekorasi kiri bawah 1" class="info-decor-bottom">
-                <img src="GambarBagianLatarBelakang/gbr_tengah bawah.png" alt="Dekorasi kiri bawah 2" class="info-decor-bottom">
-                <img src="GambarBagianLatarBelakang/gambar_akhir.png" alt="Dekorasi kanan bawah" class="info-decor-bottom">
+                <img src="GambarBagianLatarBelakang/gbr_kiribawah1.png" alt="Dekorasi kiri bawah 1" class="info-decor-bottom clickable-image" data-clickable="image">
+                <img src="GambarBagianLatarBelakang/gbr_tengah bawah.png" alt="Dekorasi kiri bawah 2" class="info-decor-bottom clickable-image" data-clickable="image">
+                <img src="GambarBagianLatarBelakang/gambar_akhir.png" alt="Dekorasi kanan bawah" class="info-decor-bottom clickable-image" data-clickable="image">
             </div>
         </div>
     </section>
@@ -290,6 +291,32 @@ $groupStandings = getGroupStandings();
                 <p>Tidak ada data klasemen grup.</p>
             <?php endif; ?>
         </div>
+        <!-- Top Score (styled like Leaderboard) -->
+        <h2 class="section-title">TOP SCORE</h2>
+        <div class="leaderboard-container" style="max-width:520px; margin-top:18px;">
+            <div style="overflow-x:auto;">
+                <table class="leaderboard-table" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left; padding:12px;">Nama</th>
+                            <th style="padding:12px; text-align:center;">Total Goal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($topScorers)): ?>
+                            <tr><td colspan="2" style="padding:18px; text-align:center;">Belum ada data pencetak gol.</td></tr>
+                        <?php else: ?>
+                            <?php foreach ($topScorers as $sc): ?>
+                                <tr>
+                                    <td style="padding:12px;"><?php echo htmlspecialchars($sc['player_name']); ?></td>
+                                    <td style="text-align:center; padding:12px;"><?php echo intval($sc['goals']); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </section>
 
     <!-- Scoreboard Section -->
@@ -408,7 +435,28 @@ $groupStandings = getGroupStandings();
         </div>
     </div>
 
+    <!-- Modal untuk gambar besar -->
+    <div id="imageModal" class="image-modal">
+        <div class="image-modal-content">
+            <span class="image-close" onclick="closeImageModal(); return false;">&times;</span>
+            <img id="modalImage" src="" alt="Enlarged Image" class="modal-image">
+        </div>
+    </div>
+
+    <!-- Instagram Widget - Fixed di bottom right -->
+    <div class="instagram-widget">
+        <a href="https://www.instagram.com/indofoodcikupacup/" target="_blank" rel="noopener noreferrer" class="instagram-link">
+            <div class="instagram-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.163c3.204 0 3.584.011 4.85.07 1.366.062 2.633.336 3.608 1.31.975.975 1.248 2.242 1.31 3.608.059 1.266.07 1.646.07 4.85s-.011 3.584-.07 4.85c-.062 1.366-.336 2.633-1.31 3.608-.975.975-2.242 1.248-3.608 1.31-1.266.059-1.646.07-4.85.07s-3.584-.011-4.85-.07c-1.366-.062-2.633-.336-3.608-1.31-.975-.975-1.248-2.242-1.31-3.608-.059-1.266-.07-1.646-.07-4.85s.011-3.584.07-4.85c.062-1.366.336-2.633 1.31-3.608.975-.975 2.242-1.248 3.608-1.31 1.266-.059 1.646-.07 4.85-.07zm0-2.163C8.73 0 8.318.011 7.048.07 5.778.128 4.556.405 3.565 1.396 2.574 2.387 2.297 3.609 2.239 4.879.18 6.149.169 6.561.169 12s.011 5.851.07 7.121c.058 1.27.335 2.492 1.326 3.483.991.991 2.213 1.268 3.483 1.326 1.27.059 1.68.07 7.121.07s5.851-.011 7.121-.07c1.27-.058 2.492-.335 3.483-1.326.991-.991 1.268-2.213 1.326-3.483.059-1.27.07-1.68.07-7.121s-.011-5.851-.07-7.121c-.058-1.27-.335-2.492-1.326-3.483-.991-.991-2.213-1.268-3.483-1.326C17.851.18 17.439.169 12 .169z"/>
+                    <circle cx="12" cy="12" r="3.6"/>
+                    <circle cx="18.5" cy="5.5" r="1.5"/>
+                </svg>
+            </div>
+            <span class="instagram-text">Click Me!!</span>
+        </a>
+    </div>
+
     <script src="assets/js/script.js"></script>
 </body>
 </html>
-

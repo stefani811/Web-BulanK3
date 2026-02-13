@@ -304,7 +304,72 @@ document.addEventListener('DOMContentLoaded', function() {
                     // fallback to navigate if AJAX fails
                     window.location.href = href;
                 });
-        });
     });
 });
 
+
+// Image Modal Functions
+function openImageModal(imgElement) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+
+    if (!modal || !modalImg) {
+        console.error('Image modal elements not found');
+        return;
+    }
+
+    modalImg.src = imgElement.src;
+    modalImg.alt = imgElement.alt || '';
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const imageModal = document.getElementById('imageModal');
+    const imageClose = document.querySelector('.image-close');
+
+    // Klik semua gambar dengan class clickable-image
+    document.querySelectorAll('.clickable-image').forEach(img => {
+        img.addEventListener('click', function () {
+            openImageModal(this);
+        });
+    });
+
+    // Tombol close (X)
+    if (imageClose) {
+        imageClose.addEventListener('click', closeImageModal);
+    }
+
+    // Klik luar gambar
+    if (imageModal) {
+        imageModal.addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeImageModal();
+            }
+        });
+    }
+});
+    // ESC key
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeImageModal();
+        }
+    });
+
+    
+    // Delegate click for all clickable images
+    document.addEventListener('click', function(e) {
+        if (e.target.hasAttribute('data-clickable') && e.target.getAttribute('data-clickable') === 'image') {
+            openImageModal(e.target);
+        }
+    });
+});
