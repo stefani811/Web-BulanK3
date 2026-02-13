@@ -11,11 +11,21 @@ $eventPurpose = $eventInfo && isset($eventInfo['event_purpose']) ? $eventInfo['e
 
 $matches = getAllMatchesWithOngoing();
 $teams = getAllTeams();
-// Hide QC team from the frontend (non-destructive). Keep team in DB.
+// Hide QC & Rewinder team from the frontend (non-destructive). Keep team in DB.
 $teams = array_values(array_filter($teams, function($t){
     $code = isset($t['team_code']) ? strtolower($t['team_code']) : '';
     $name = isset($t['team_name']) ? strtolower($t['team_name']) : '';
-    return ($code !== 'qc' && strpos($name, 'qc') === false);
+
+    return (
+        $code !== 'qc' &&
+        $code !== 'it' &&
+        $code !== 'rewinder' &&
+        $code !== 'accounting' &&
+        strpos($name, 'qc') === false &&
+        strpos($name, 'it') === false &&
+        strpos($name, 'rewinder') === false &&
+        strpos($name, 'accounting') === false
+    );
 }));
 $week = isset($_GET['week']) ? intval($_GET['week']) : 1;
 $schedule = getScheduleByWeek($week); // selected week
@@ -35,7 +45,7 @@ $groupStandings = getGroupStandings();
     <!-- Hero Section -->
     <section class="hero-section">
         <div class="hero-background">
-            <img src="assets/images/hero-team.jpg" alt="Team Photo" class="hero-image">
+            <img src="assets/images/hero-utama.jpg" alt="Team Photo" class="hero-image">
             <div class="hero-overlay"></div>
         </div>
         <div class="logo-k3">
@@ -134,7 +144,7 @@ $groupStandings = getGroupStandings();
             <?php
             // Generate schedule table
             $times = ['19:00', '20:00', '21:00', '22:00', '23:00', '00:00'];
-            $days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+            $daysIndonesian = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             
             // Get first date from schedule or use current week
             $firstDate = null;
@@ -164,7 +174,8 @@ $groupStandings = getGroupStandings();
                             <?php for ($i = 0; $i < 7; $i++): 
                                 $currentDate = clone $firstDate;
                                 $currentDate->modify("+$i days");
-                                $dayName = $days[$i];
+                                $dayOfWeek = (int)$currentDate->format('w');
+                                $dayName = $daysIndonesian[$dayOfWeek];
                                 $dateStr = $currentDate->format('M d');
                             ?>
                                 <th>
@@ -237,10 +248,11 @@ $groupStandings = getGroupStandings();
                                 <thead>
                                     <tr>
                                         <th style="text-align:left; padding:8px;">Team</th>
-                                        <th style="padding:8px; text-align:center;">Main</th>
+                                        <th style="padding:8px; text-align:center;">Match</th>
                                         <th style="padding:8px; text-align:center;">Win</th>
                                         <th style="padding:8px; text-align:center;">Draw</th>
                                         <th style="padding:8px; text-align:center;">Lose</th>
+                                        <th style="padding:8px; text-align:center;">Goals</th>
                                         <th style="padding:8px; text-align:center;">Total Poin</th>
                                     </tr>
                                 </thead>
@@ -264,6 +276,7 @@ $groupStandings = getGroupStandings();
                                                 <td style="text-align:center; padding:8px;"><?php echo $t['win']; ?></td>
                                                 <td style="text-align:center; padding:8px;"><?php echo $t['draw']; ?></td>
                                                 <td style="text-align:center; padding:8px;"><?php echo $t['lose']; ?></td>
+                                                <td style="text-align:center; padding:8px;"><?php echo $t['goals_for'] . ':' . $t['goals_against']; ?></td>
                                                 <td style="text-align:center; padding:8px;"><?php echo $t['points']; ?></td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -368,11 +381,13 @@ $groupStandings = getGroupStandings();
                                 $playersHtml = '';
                                 if (!empty($prePlayers)) {
                                     $playersHtml .= '<h3 style="margin-bottom: 20px; color: #1e3c72;">' . htmlspecialchars($team['team_name']) . '</h3>';
-                                    $playersHtml .= '<ol style="padding-left:20px; margin-top:10px; color:#222;">';
+                                    $playersHtml .= '<table style="width:100%; border-collapse:collapse;"><thead><tr style="border-bottom:2px solid #ddd;"><th style="text-align:left; padding:8px; background:#f5f5f5;">No</th><th style="text-align:left; padding:8px; background:#f5f5f5;">Nama Pemain</th></tr></thead><tbody>';
+                                    $idx = 1;
                                     foreach ($prePlayers as $p) {
-                                        $playersHtml .= '<li style="margin-bottom:6px;">' . htmlspecialchars($p['player_name']) . '</li>';
+                                        $playersHtml .= '<tr style="border-bottom:1px solid #eee;"><td style="padding:8px;">' . $idx . '</td><td style="padding:8px;">' . htmlspecialchars($p['player_name']) . '</td></tr>';
+                                        $idx++;
                                     }
-                                    $playersHtml .= '</ol>';
+                                    $playersHtml .= '</tbody></table>';
                                 } else {
                                     $playersHtml = '<p style="text-align: center; padding: 20px; color: #666;">Belum ada data pemain untuk tim ini.</p>';
                                 }

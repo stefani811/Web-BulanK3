@@ -127,11 +127,13 @@ function viewPlayers(teamCode) {
                 }
                 
                 if (data.players && data.players.length > 0) {
-                    html += '<ol style="padding-left:20px; margin-top:10px; color:#222;">';
-                    data.players.forEach((player) => {
-                        html += `<li style="margin-bottom:6px;">${player.player_name}</li>`;
+                    html += '<table style="width:100%; border-collapse:collapse; margin-top:10px;">';
+                    html += '<thead><tr style="border-bottom:2px solid #ddd;"><th style="text-align:left; padding:8px; background:#f5f5f5;">No</th><th style="text-align:left; padding:8px; background:#f5f5f5;">Nama Pemain</th></tr></thead>';
+                    html += '<tbody>';
+                    data.players.forEach((player, idx) => {
+                        html += `<tr style="border-bottom:1px solid #eee;"><td style="padding:8px;">${idx + 1}</td><td style="padding:8px;">${player.player_name}</td></tr>`;
                     });
-                    html += '</ol>';
+                    html += '</tbody></table>';
                 } else {
                     html += '<p style="text-align: center; padding: 20px; color: #666;">Belum ada data pemain untuk tim ini.</p>';
                 }

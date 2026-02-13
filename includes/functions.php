@@ -268,6 +268,8 @@ function getGroupStandings() {
                     'win' => 0,
                     'draw' => 0,
                     'lose' => 0,
+                    'goals_for' => 0,
+                    'goals_against' => 0,
                     'points' => 0
                 ];
             }
@@ -289,6 +291,12 @@ function getGroupStandings() {
             // increment played
             $teams[$homeCode]['played']++;
             $teams[$awayCode]['played']++;
+
+            // update goals
+            $teams[$homeCode]['goals_for'] += $homeScore;
+            $teams[$homeCode]['goals_against'] += $awayScore;
+            $teams[$awayCode]['goals_for'] += $awayScore;
+            $teams[$awayCode]['goals_against'] += $homeScore;
 
             if ($homeScore > $awayScore) {
                 $teams[$homeCode]['win']++;
