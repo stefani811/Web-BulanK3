@@ -979,7 +979,10 @@ body {
 .image-modal {
     display: none;
     position: fixed;
-    z-index: 1000;
+    inset: 0;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
     left: 0;
     top: 0;
     width: 100%;
@@ -1019,13 +1022,11 @@ body {
 }
 
 .modal-image {
-    max-width: 95vw;
-    max-height: 90vh;
-    width: auto;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+    width: 80vw;
+    height: 100vh;
     object-fit: contain;
+    transform: scale(1);
 }
 
 .image-close {

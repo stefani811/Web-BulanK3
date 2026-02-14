@@ -306,70 +306,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
     });
 });
-
-
-// Image Modal Functions
-function openImageModal(imgElement) {
-    const modal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImage');
-
-    if (!modal || !modalImg) {
-        console.error('Image modal elements not found');
-        return;
-    }
-
-    modalImg.src = imgElement.src;
-    modalImg.alt = imgElement.alt || '';
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeImageModal() {
-    const modal = document.getElementById('imageModal');
-    if (modal) {
-        modal.classList.remove('show');
-        document.body.style.overflow = 'auto';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-
-    const imageModal = document.getElementById('imageModal');
-    const imageClose = document.querySelector('.image-close');
-
-    // Klik semua gambar dengan class clickable-image
-    document.querySelectorAll('.clickable-image').forEach(img => {
-        img.addEventListener('click', function () {
-            openImageModal(this);
-        });
-    });
-
-    // Tombol close (X)
-    if (imageClose) {
-        imageClose.addEventListener('click', closeImageModal);
-    }
-
-    // Klik luar gambar
-    if (imageModal) {
-        imageModal.addEventListener('click', function (e) {
-            if (e.target === this) {
-                closeImageModal();
-            }
-        });
-    }
 });
-    // ESC key
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-            closeImageModal();
-        }
+
+// Image Modal
+document.addEventListener("DOMContentLoaded", function () {
+
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImage");
+    const closeBtn = document.querySelector(".image-close");
+    const images = document.querySelectorAll(".clickable-image");
+
+    console.log("Images found:", images.length);
+
+    images.forEach(function (img) {
+        img.addEventListener("click", function () {
+            modal.classList.add("show");
+            modalImg.src = this.src;
+        });
     });
 
-    
-    // Delegate click for all clickable images
-    document.addEventListener('click', function(e) {
-        if (e.target.hasAttribute('data-clickable') && e.target.getAttribute('data-clickable') === 'image') {
-            openImageModal(e.target);
+    closeBtn.addEventListener("click", function () {
+        modal.classList.remove("show");
+    });
+
+    modal.addEventListener("click", function (e) {
+        if (e.target === modal) {
+            modal.classList.remove("show");
         }
     });
 });
